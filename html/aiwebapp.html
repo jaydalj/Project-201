@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Hangman Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        #hangman {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background-color: #f9f9f9;
+        }
+        input {
+            padding: 5px;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button {
+            padding: 5px 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="hangman">
+        <h1>Hangman Game</h1>
+        <p id="word">____</p>
+        <p id="message"></p>
+        <input id="guess" type="text" maxlength="1" placeholder="Enter a letter">
+        <button id="submit">Guess</button>
+        <p id="remaining">Remaining Guesses: 5</p>
+        <p id="used-letters">Used Letters: </p>
+    </div>
+
+    <script>
+        // Fixed four-letter word for the game
+        const word = "love";
+        let remainingGuesses = 5;
+        let usedLetters = [];
+
+        // Function to update the displayed word with blanks or correct guesses
+        function updateWord() {
+            const displayWord = word.split('').map(letter => usedLetters.includes(letter) ? letter : "_").join('');
+            document.getElementById("word").textContent = displayWord;
+        }
+
+        // Handle the guess and update the game state
+        function handleGuess() {
+            const guess = document.getElementById("guess").value.trim().toLowerCase();
+
+            // Only proceed if the input is a valid letter and not a repeated guess
+            if (guess.length === 1 && /^[a-z]$/i.test(guess) && !usedLetters.includes(guess)) {
+                usedLetters.push(guess);
+
+                if (word.includes(guess)) {
+                    document.getElementById("message").textContent = "Correct guess!";
+                } else {
+                    remainingGuesses--;
+                    document.getElementById("message").textContent = "Wrong guess!";
+                }
+
+                // Update remaining guesses and used letters
+                document.getElementById("remaining").textContent = `Remaining Guesses: ${remainingGuesses}`;
+                document.getElementById("used-letters").textContent = `Used Letters: ${usedLetters.join(', ')}`;
+                document.getElementById("guess").value = ''; // Clear the input field
+
+                updateWord(); // Update the word display
+
+                // Check for win or lose conditions
+                if (remainingGuesses <= 0) {
+                    document.getElementById("message").textContent = `Game Over! The word was: ${word}`;
+                    document.getElementById("submit").disabled = true;
+                } else if (!document.getElementById("word").textContent.includes("_")) {
+                    document.getElementById("message").textContent = "You Win!";
+                    document.getElementById("submit").disabled = true;
+                }
+            } else {
+                alert("Please enter a valid, unused letter.");
+            }
+        }
+
+        // Add event listener for button click
+        document.getElementById("submit").addEventListener("click", handleGuess);
+
+        // Initial call to display the word with blanks
+        updateWord();
+    </script>
+
+</body>
+</html>
